@@ -15,6 +15,34 @@
             "secretRole": "Developer",
             "ip": "127.0.129.193",
             "ingame": false
+        },
+        {
+            "user": "Paul",
+            "phone": "+446583875356",
+            "secretRole": "Network Admin",
+            "ip": "127.0.129.194",
+            "ingame": true
+        },
+        {
+            "user": "Tiffany",
+            "phone": "+44835963793",
+            "secretRole": "Hacker",
+            "ip": "127.0.129.195",
+            "ingame": true
+        },
+        {
+            "user": "Jeff",
+            "phone": "+44120864753",
+            "secretRole": "UX Consultant",
+            "ip": "127.0.129.196",
+            "ingame": false
+        },
+        {
+            "user": "Jessica",
+            "phone": "+44098675898",
+            "secretRole": "UI Designer",
+            "ip": "127.0.129.197",
+            "ingame": true
         }
     ],
     "messages": [
@@ -45,8 +73,13 @@
             "type": "neutral"
         },
         {
-            "role": "UX Consultant",
+            "role": "UI Designer",
             "ingame": true,
+            "type": "neutral"
+        },
+        {
+            "role": "UX Consultant",
+            "ingame": false,
             "type": "neutral"
         }
     ],
@@ -55,5 +88,9 @@
         "role": "Developer",
         "type": "neutral"
     }],
-    "ddosed": []
+    "ddosed": [{
+        "user": "Jeff",
+        "role": "UX Consultant",
+        "type": "neutral"
+    }]
 }

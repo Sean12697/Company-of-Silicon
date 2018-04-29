@@ -49,7 +49,7 @@ function init() {
     // readJSON(); // replace with createJSON();
     // setInterval(readJSON, 100);
     simulateGame();
-    setInterval(simulateGame, 500);
+    setInterval(simulateGame, 700);
     getNumber();
 }
 

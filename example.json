@@ -1,0 +1,59 @@
+{
+    "started": true,
+    "number": "+448754864528",
+    "players": [
+        {
+            "user": "Sean12697",
+            "phone": "+44809874536",
+            "secretRole": "CEO",
+            "ip": "127.0.129.192",
+            "ingame": true
+        },
+        {
+            "user": "Tal",
+            "phone": "+44216976539",
+            "secretRole": "Developer",
+            "ip": "127.0.129.193",
+            "ingame": false
+        }
+    ],
+    "messages": [
+        "Game Started",
+        "10 Second until Night Time",
+        "The Networks slows down slightly",
+        "Morning",
+        "G is offline, a DDOS attack is suspected"
+    ],
+    "roles": [{
+            "role": "CEO",
+            "ingame": true,
+            "type": "boss"
+        },
+        {
+            "role": "Network Admin",
+            "ingame": true,
+            "type": "good"
+        },
+        {
+            "role": "Hacker",
+            "ingame": true,
+            "type": "bad"
+        },
+        {
+            "role": "Developer",
+            "ingame": false,
+            "type": "neutral"
+        },
+        {
+            "role": "UX Consultant",
+            "ingame": true,
+            "type": "neutral"
+        }
+    ],
+    "fired": [{
+        "user": "Tal",
+        "role": "Developer",
+        "type": "neutral"
+    }],
+    "ddosed": []
+}

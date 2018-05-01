@@ -1,62 +1,25 @@
 window.addEventListener('load', init);
 var jsonDemo = {},
-    stageDemo = 0;
-const jsonFile = "example.json";
-const server = "http://ec2-18-130-82-13.eu-west-2.compute.amazonaws.com";
-var messageStack = [],
-    messageStackPointer = 0,
-    players = [],
-    roles = [{
-        name: "CEO",
-        desc: "Your aim is to fire the hackers!",
-        type: "boss",
-        ingame: true
-    }, {
-        name: "Network Admin",
-        desc: "Your aim is to protect the CEO from DDOS attacks",
-        type: "good",
-        ingame: true
-    }, {
-        name: "Hacker",
-        desc: "Your aim is to DDOS the CEO!",
-        type: "bad",
-        ingame: true
-    }, {
-        name: "Developer",
-        desc: "You are a normal player",
-        type: "neutral",
-        ingame: true
-    }, {
-        name: "UX Consultant",
-        desc: "You are a normal player",
-        type: "neutral",
-        ingame: true
-    }, {
-        name: "UI Designer",
-        desc: "You are a normal player",
-        type: "neutral",
-        ingame: true
-    }],
-    pickedRoles = roles,
-    lines = [],
-    fired = [],
-    ddosed = [];
-var inGame = false;
+    stageDemo = 0; // used to imitate the flow of data which would be used in a real game
+const jsonFile = "example.json"; // a json format which is used in the DOM manipulation
+const server = "http://ec2-18-130-82-13.eu-west-2.compute.amazonaws.com"; // a reference to a custom server endpoint for API calls
+var messageStack, messageStackPointer, players, roles, pickedRoles, lines, fired, ddosed, inGame; // used to store the live data for the DOM manipulation
 
 function init() {
+    initJson(); // created to clean code
     document.getElementById("game").style.display = "none";
     document.getElementById("start").addEventListener('click', toGame);
-    // readJSON(); // replace with createJSON();
-    // setInterval(readJSON, 100);
+    // readJSON() uses a formatted JSON file, which would mimic a back-end API calls result
+    // createJSON() would use live data, which would have calculations done on the front end using API calls
+    // simulateGame() uses mimicked live data, which is updated via the built-in setInterval function
     simulateGame();
-    setInterval(simulateGame, 700);
-    getNumber();
+    setInterval(simulateGame, 1000); // interval rate set low for the max two minute presentation, not mimicking the pace a real game would be
 }
 
 function createJSON() {
     var json = {};
     json.started = inGame;
-    json.number = getNumber(); // might fall down
+    json.number = getNumber(); // might fall down, since it an async type task, which it did and had no time to change
     checkMessages();
     progress();
     json.players = players;
@@ -68,21 +31,21 @@ function createJSON() {
 }
 
 function progress() {
-    // do lines
+    // do lines (processing)
 }
 
-function checkMessages() {
+function checkMessages() { // goes through all messages in the stack
     messageStack = reducedMessages(getMessages()); // might fall down
     if (messageStack.length != 0) {
-        for (var i = messageStackPointer; i <= messageStack.length; i++) {
-            dealWithMessage(messageStack[i]);
-        }
-        messageStackPointer = messageStack.length - 1;
+        // going through all NEW messages not been processed
+        for (var i = messageStackPointer; i <= messageStack.length; i++) dealWithMessage(messageStack[i]);
+        messageStackPointer = messageStack.length - 1; // updates what messages have been read in the stack
     }
 }
 
+// This function would contain all if statements to deal with the different commands the user can enter
 function dealWithMessage(message) {
-    if (newUser(message)) return;
+    if (newUser(message)) return; // returns due to being the only execution a new user would do
     if (message.body.split(" ")[0] == "/talk") lines.push(getUser(message.from) + ": " + message.body.replace("/talk ", ""));
 }
 
@@ -96,24 +59,22 @@ function newUser(message) {
     var userExists = false;
     for (var i = 0; i < players.length; i++) {
         if (players[i].phone == message.from) userExists = true;
-    }
+    } 
     if (!userExists) {
-        var role = getRole();
+        var role = getRole(); // random unique role
         players.push({
             user: message.body,
             phone: message.from,
             ingame: true,
-            ip: "127.0.0.1",
+            ip: "127.0.0.1", // a unique ip randomiser would be implemented
             secretRole: role.name
-        });
-        sendText(message.from, "Your role is the " + role.name + "\n" + role.desc); // might fall down
-    }
-    return userExists;
+        }); sendText(message.from, "Your role is the " + role.name + "\n" + role.desc); // might fall down (async again, although should be fine)
+    } return userExists;
 }
 
 function getRole() {
     pickedRoles = shuffle(pickedRoles);
-    return pickedRoles.pop();
+    return pickedRoles.pop(); // removing the role from possible roles given (when given)
 }
 
 // https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
@@ -121,14 +82,15 @@ function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+    } return a;
 }
 
+// needed since the Twilio API showed outbound messages were returned in the API call, which are not needed and could cause issues
 function reducedMessages(json) {
     return json.filter(a => a.direction == "inbound");
 }
 
+// Custom back-end API call, making API calls to a set-up Twilio Account for the game
 function sendText(number, body) {
     $.post(server + "/message", {
         number: number,
@@ -136,12 +98,14 @@ function sendText(number, body) {
     });
 }
 
+// Custom back-end API call, making API calls to a set-up Twilio Account for the game
 function getMessages() {
     $.get(server + "/get_messages", function (data, status) {
         return data;
     });
 }
 
+// Custom back-end API call, making API calls to a set-up Twilio Account for the game
 function getNumber() {
     $.get(server + "/get_phone_number", function (data, status) {
         console.log(data);
@@ -164,27 +128,33 @@ function drawOnDOM(json) {
     }
 }
 
+// A custom method to add multiple indexes from an array within a HTML element, adding a heading if needed before/above ("before")
 function itterateAdd(before, elementID, array) {
     var x = document.getElementById(elementID);
     x.innerHTML = before;
     for (var i = 0; i < array.length; i++) {
-        var c = "";
+        var c = ""; // used to hold any class names if needed
         var txt = array[i];
+        // adding classes
         if (array[i].hasOwnProperty("ingame")) c += (array[i].ingame) ? "" : "strike ";
         if (array[i].hasOwnProperty("type")) c += array[i].type;
+        // setting the text based on which properties the object has
         if (array[i].hasOwnProperty("user") && array[i].hasOwnProperty("role")) txt = array[i].user + " (" + array[i].role + ")";
         if (array[i].hasOwnProperty("user") && array[i].hasOwnProperty("ip")) txt = array[i].user + " - " + array[i].ip;
         if (!array[i].hasOwnProperty("user") && array[i].hasOwnProperty("role")) txt = array[i].role;
+        // adding index i to the element
         x.innerHTML += "<p class='" + c + "'>" + txt + "</p>";
     }
 }
 
+// simply changing the screen from the welcome, to the game
 function toGame() {
     document.getElementById("welcome").style.display = "none";
     document.getElementById("game").style.display = "block";
     inGame = true;
 }
 
+// used to imitate an ideal JSON back-end API call, but using a local jsonFile location instead
 function readJSON() {
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", jsonFile, false);
@@ -198,11 +168,13 @@ function readJSON() {
     rawFile.send(null);
 }
 
+// used to ensure that the main text view shows the latest updates to the game
 window.setInterval(function() {
     var elem = document.getElementById('messages');
     elem.scrollTop = elem.scrollHeight;
-  }, 500);
+  }, 1000);
 
+// mimics a changing JSON object, which a real game would look like (roughly), although not to completion (due to presentation time)
 function simulateGame() {
     if (stageDemo == 0) jsonDemo = {
         "started": false,
@@ -324,4 +296,47 @@ function simulateGame() {
     });
     stageDemo++;
     drawOnDOM(jsonDemo);
+}
+
+function initJson() {
+    messageStack = [];
+    messageStackPointer = 0;
+    players = [];
+    // all possible roles to be picked from at random
+    roles = [{
+        name: "CEO",
+        desc: "Your aim is to fire the hackers!",
+        type: "boss",
+        ingame: true
+    }, {
+        name: "Network Admin",
+        desc: "Your aim is to protect the CEO from DDOS attacks",
+        type: "good",
+        ingame: true
+    }, {
+        name: "Hacker",
+        desc: "Your aim is to DDOS the CEO!",
+        type: "bad",
+        ingame: true
+    }, {
+        name: "Developer",
+        desc: "You are a normal player",
+        type: "neutral",
+        ingame: true
+    }, {
+        name: "UX Consultant",
+        desc: "You are a normal player",
+        type: "neutral",
+        ingame: true
+    }, {
+        name: "UI Designer",
+        desc: "You are a normal player",
+        type: "neutral",
+        ingame: true
+    }];
+    pickedRoles = roles;
+    lines = [];
+    fired = [];
+    ddosed = [];
+    inGame = false;
 }
